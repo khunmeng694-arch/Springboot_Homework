@@ -1,9 +1,8 @@
-package com.khun.homework1.TeacherController;
+package com.khun.homework1.Controller;
 
 import com.khun.homework1.Model.StudentModel;
 import com.khun.homework1.Service.StudentService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

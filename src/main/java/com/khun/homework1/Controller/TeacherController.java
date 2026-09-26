@@ -1,4 +1,4 @@
-package com.khun.homework1.TeacherController;
+package com.khun.homework1.Controller;
 import com.khun.homework1.Model.TeacherModel;
 import com.khun.homework1.Service.TeacherService;
 import org.springframework.http.HttpStatus;
