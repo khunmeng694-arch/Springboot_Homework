@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Balance - e-Banking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent-blue: #0284c7;
+            --accent-blue-hover: #0369a1;
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-badge {
+            background: #2563eb;
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-blue);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            padding: 32px 28px;
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+        }
+
+        .card-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .card-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+        }
+
+        .balance-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .balance-stat small {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .balance-stat span {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* ជួសជុល: បន្ថែម position: relative និង cursor */
+        .currency-block {
+            position: relative;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            cursor: text;
+        }
+
+        .currency-block:focus-within {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .block-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .badge-usd {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-khr {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .currency-symbol {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            min-width: 20px;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* ជួសជុល input-control */
+        .input-control {
+            flex: 1;
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: transparent;
+            font-family: inherit;
+            cursor: text;
+            display: block;
+        }
+
+        .input-control::-webkit-outer-spin-button,
+        .input-control::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-control[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .input-control::placeholder {
+            color: #cbd5e1;
+        }
+
+        .help-text {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .btn-submit:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <div class="brand">
+        <span>MKBank</span>
+        <span class="brand-badge">E-BANKING</span>
+    </div>
+</header>
+
+<main class="container">
+    <a th:href="@{/balance}" class="back-link">&larr; Back to Dashboard</a>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Deposit Balance</h2>
+            <p>Enter deposit amount in USD, KHR, or both accounts.</p>
+        </div>
+
+        <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+        <div th:if="${success}" class="alert-success" th:text="${success}"></div>
+
+        <div class="balance-overview" th:if="${balance != null}">
+            <div class="balance-stat">
+                <small>Available USD</small>
+                <span>$<span th:text="${balance.usdBalance != null ? #numbers.formatDecimal(balance.usdBalance, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span></span>
+            </div>
+            <div class="balance-stat">
+                <small>Available KHR</small>
+                <span><span th:text="${balance.khrBalance != null ? #numbers.formatDecimal(balance.khrBalance, 1, 'COMMA', 0, 'POINT') : '0'}">0</span> &#x17DB;</span>
+            </div>
+        </div>    
+
+        <form th:action="@{/deposit}" method="get" onsubmit="return handleDefaultValues(this)">
+            <!-- USD Input -->
+            <div class="currency-block" onclick="document.getElementById('usd').focus()">
+                <div class="block-header">
+                    <label for="usd" class="block-label">USD Amount</label>
+                    <span class="badge badge-usd">USD Account</span>
+                </div>
+                <div class="input-row">
+                    <span class="currency-symbol">$</span>
+                    <input type="number"
+                           id="usd"
+                           name="usd"
+                           step="any"
+                           min="0"
+                           inputmode="decimal"
+                           class="input-control"
+                           placeholder="0.00">
+                </div>
+                <small class="help-text">Leave blank or 0 if depositing KHR only</small>
+            </div>
+
+            <!-- KHR Input -->
+            <div class="currency-block" onclick="document.getElementById('khr').focus()">
+                <div class="block-header">
+                    <label for="khr" class="block-label">KHR Amount</label>
+                    <span class="badge badge-khr">KHR Account</span>
+                </div>
+                <div class="input-row">
+                    <span class="currency-symbol">&#x17DB;</span>
+                    <input type="number"
+                           id="khr"
+                           name="khr"
+                           step="1"
+                           min="0"
+                           inputmode="numeric"
+                           class="input-control"
+                           placeholder="0">
+                </div>
+                <small class="help-text">Leave blank or 0 if depositing USD only</small>
+            </div>
+
+            <button type="submit" class="btn-submit">Confirm Deposit</button>
+        </form>
+    </div>
+</main>
+
+<script>
+    function handleDefaultValues(form) {
+        var usdVal = form.usd.value ? form.usd.value.trim() : '';
+        var khrVal = form.khr.value ? form.khr.value.trim() : '';
+        var usdNum = parseFloat(usdVal) || 0;
+        var khrNum = parseFloat(khrVal) || 0;
+
+        if (usdNum <= 0 && khrNum <= 0) {
+            alert('Please enter an amount greater than 0 to deposit.');
+            return false;
+        }
+
+        if (!usdVal) {
+            form.usd.value = '0';
+        }
+        if (!khrVal) {
+            form.khr.value = '0';
+        }
+        return true;
+    }
+</script>
+
+</body>
+</html>
